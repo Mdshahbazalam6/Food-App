@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0%;
+            padding: 0%;
+            box-sizing: border-box;
+            font-family: sans-serif;
+        }
+        h1{
+            text-align: center;
+            background-color: teal;
+            padding: 1vw;
+            margin-bottom: 2vh;
+            /* font-family: Georgia, 'Times New Roman', Times, serif; */
+            font-family:Arial, Helvetica, sans-serif;
+        }
+        #box{
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            width: 96vw;
+            margin: auto;
+            gap: 1vw;
+            text-align: center;
+        }
+        #box > div{
+            width: 20vw;
+            border: 1px solid #cecece;
+            border-radius: 3px;
+        }
+        #box >div> img{
+         width: 100%;
+         height: 60%;
+        }
+       #sel{
+           width: 5vw;
+           margin-left: 2vw;
+       }
+    </style>
+</head>
+<body>
+    <h1>Search Your Food here</h1>
+    <select name="" id="sel" onchange="display(value)"></select>
+    <div id="box"></div>
+</body>
+<script>
+    var listInLocalStorage=localStorage.getItem("foodlist")
+    if(listInLocalStorage === null){
+    fetch(`https://www.themealdb.com/api/json/v1/1/categories.php`)
+    .then((res)=>{
+        res.json().then((res)=>{
+            // console.log(res)
+            store(res.categories)
+        })
+    })
+    .catch((err)=>{
+        console.log(error)
+    })
+}
+// var listItems=[]
+const store=(res)=>{
+    let arr=localStorage.setItem('foodlist','[]')
+    arr=JSON.parse(localStorage.getItem("foodlist"))
+    console.log(res)
+    res.forEach((ele) => {
+        // console.log(ele.strCategory)
+        arr.push(ele.strCategory)
+    });
+    localStorage.setItem("foodlist",JSON.stringify(arr))
+}
+// console.log(listItems)
+ 
+const items=JSON.parse(localStorage.getItem("foodlist"))
+var select=document.querySelector("#sel")
+select.innerHTML=``
+items.forEach((ele)=>{
+    let opt=document.createElement("option")
+    opt.value=ele
+    opt.innerHTML=ele
+    select.append(opt)
+})
+
+const display =(ele)=>{
+    console.log(ele)
+    fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${ele}`)
+    .then((res)=>{
+        res.json().then((res)=>{
+            // console.log(res)
+            show(res.meals)
+        })
+    })
+    .catch((err)=>{
+        console.log(error)
+    })
+}
+
+let box=document.querySelector("#box")
+box.innerHTML=``
+const show=(ele)=>{
+    box.innerHTML=``
+// console.log(ele)
+ele.forEach((data)=>{
+    // console.log(data)
+    let container=document.createElement("div")
+    let image=document.createElement("img")
+    image.src=data.strMealThumb
+    let p=document.createElement("p")
+    p.innerHTML=data.strMeal
+    container.append(image,p)
+    box.append(container)
+})
+}
+</script>
+</html>
